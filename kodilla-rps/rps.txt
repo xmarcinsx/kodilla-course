@@ -1,0 +1,104 @@
+Gra RPS
+
+1. Główna klasa RpsRunner z metodą main:
+
+    public static void main(String[] args) {
+        RpsMenu.printMenu();
+        new RpsGame(RpsMenu.getGameDefinition()).play();
+    }
+
+3. Klasa RpsGameDefinition zwierająca definicję gry (nazwa użytkownika i liczba rund):
+ 	private final String name;
+	private final int rounds;
+     oraz konsturktor i gettery.
+
+2. Klasa RpsMenu służąca do komunikacji aplikacji z użytkownikiem. Zawiera stałe komunikatów oraz metody:
+	static void printMenu();				-- drukuje menu
+	static RpsGameDefinition getGameDefinition(); 		-- pobiera dane od użytkownika i zwraca obiekt typu RpsGameDefinition, będący danymi do gry
+	static void printResult(argumenty);			-- drukuje wynik rundy
+	static void printGameSummary(argumrnty)			-- drukuje statystyki skończonej/przerwanej gry
+	public static void printRoundInfo(int roundNumer) 	-- drukuje informacje na temat danej rundy (numer rundy)
+	public static RpsTurn getUserTurn()			-- pobiera od usera ruch i zwraca ruch użytkownika
+	public static void printComputerMoveInfo(RpsTurn move)	-- drukuje ruch komputera		
+
+3. public enum RpsRoundResult {
+    BAD, END, REPLAY, DRAW, USER, COMPUTER
+} -- wyniki pojedynczej rundy
+
+4. public enum RpsTurn {
+
+    BAD(""), END("x"), REPLAY("n"), ROCK("1"), PAPER("2"), SCISSORS("3");
+
+    private String move;
+
+    RpsTurn(String move) {
+        this.move = move;
+    }
+
+    public static RpsTurn getMove(String move) {
+        return Arrays.stream(values()).filter(x -> x.getMove().equalsIgnoreCase(move)).findFirst().orElse(BAD);
+    }
+
+    public static RpsTurn getMove(Integer move) {
+        return getMove(move.toString());
+    }
+
+    public String getMove() {
+        return move;
+    }
+} -- enum oznaczający jeden ruch gracza
+
+5. RpsMoveComparator - klasa służąca do porównywania ruchów i zwracająca wynik rundy:
+    public static RpsRoundResult comapre(RpsTurn userTurn, RpsTurn computerTurn);
+
+6. RpsRoundRunner - klasa, której obiekty reprezentują jedną rundę gry
+
+public class RpsRoundRunner {
+
+    private static final Random random = new Random();
+    private static final Scanner scanner = new Scanner(System.in);
+
+    private final int roundNumer;
+
+    public RpsRoundRunner(int roundNumer) {
+        this.roundNumer = roundNumer;
+    }
+
+    public RpsRoundResult play() {
+	...
+    }
+
+    private RpsTurn getUserTurn() {
+	...
+    }
+
+    private RpsTurn getComputerTurn() {
+       ... // losuje i zwraca ruch komputera
+    }
+
+    private RpsTurn getUserTurn() {
+        return RpsMenu.getUserTurn();
+    }
+
+}
+
+7. Klasa gry RpsGame - główna klasa gry, zwiera pola definiujące daną grę:
+    private String userName;		-- nazwa użytkownika
+    private int rounds;			-- liczba rund
+    private int roundNr;		-- numer aktualnej rundy
+    private int userWins;		-- liczba wygranych użytkownika w grze
+    private int computerWins;		-- liczba wygranych komputera w grze
+    private int draws;			-- liczba remisów w grze
+    private boolean end;		-- czy zakończyć grę
+  oraz metody:
+	void initGame() 		-- inicjowanie zmiennych instancyjnych klasy
+	boolean playRound()		-- odpalenie jednej rundy gry
+	    
+	public void play() {		-- główna metoda gry
+        initGame();
+        while (!end && roundNr <= rounds) {
+            end = playRound();
+	    }
+        RpsMenu.printGameSummary(userName, computerWins, userWins, draws);
+    }
+		
